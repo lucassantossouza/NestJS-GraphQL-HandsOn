@@ -1,91 +1,75 @@
 //cria as validações dos dados que serão recebidos
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateCredentialDto } from '../credential/credential.dto';
 import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsNumber,
   MinLength,
   MaxLength,
   IsPhoneNumber,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'Nome não está em formato válido' })
+  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @MinLength(3, { message: 'Nome deve ter no mínimo 3 caracteres' })
+  @MaxLength(254, { message: 'Nome deve ter no máximo 254 caracteres' })
   @ApiProperty({
     required: true,
-    description: 'Nome do usuário',
-    example: 'João',
-    type: String,
+    description: 'Nome completo do usuário',
+    example: 'João da Silva',
   })
   name: string;
 
-  @IsString()
+  // nickname
+  @IsOptional()
+  @IsString({
+    message: 'Apelido ou nome para exibição não está em formato válido',
+  })
+  @MinLength(3, {
+    message: 'Apelido ou nome para exibição deve ter no mínimo 3 caracteres',
+  })
+  @MaxLength(254, {
+    message: 'Apelido ou nome para exibição deve ter no máximo 254 caracteres',
+  })
   @ApiProperty({
     required: false,
-    description: 'Apelido do usuário ou como ele prefere ser chamado',
-    example: 'Joãozin',
+    description: 'Apelido ou nome para exibição do usuário',
+    example: 'Joãozinho',
   })
-  nickname: string;
+  nickname?: string;
 
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Email não está em formato válido' })
+  @IsNotEmpty({ message: 'Email é obrigatório' })
+  @MaxLength(254, { message: 'Email deve ter no máximo 254 caracteres' })
   @ApiProperty({
     required: true,
     description: 'Email do usuário',
-    example: 'joaozin@jao.com',
+    example: 'joaozinho@joao.com',
   })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  // set validate phone number
-  @IsPhoneNumber('BR')
-  // set regex to validate phone number
+  @IsPhoneNumber('BR', {
+    message: 'Telefone celular não está em formato válido',
+  })
+  @IsNotEmpty({ message: 'Telefone celular é obrigatório' })
+  @MaxLength(11, {
+    message: 'Telefone celular deve ter no máximo 11 caracteres (DDD + número)',
+  })
   @ApiProperty({
     required: true,
-    description: 'Telefone do usuário (somente números com DDD)',
-    example: '11912345678',
+    description: 'Telefone celular do usuário',
+    example: '11999999999',
   })
   phone: string;
 
-  // @IsNumber()
-  // @ApiProperty()
-  // credentialId: number;
-}
-
-export class UpdateUserDto {
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  name: string;
-
-  @IsString()
-  @ApiProperty()
-  nickname: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty()
-  email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(10)
-  @MaxLength(11)
-  @ApiProperty()
-  phone: string;
-}
-
-export class GetUserDto {
-  @IsNumber()
-  @ApiProperty()
-  id: number;
-}
-
-export class DeleteUserDto {
-  @IsNumber()
-  @ApiProperty()
-  id: number;
+  // set type to CreateCredentialDto
+  @ApiProperty({
+    required: true,
+    description: 'Credenciais do usuário',
+    type: CreateCredentialDto,
+  })
+  credential: CreateCredentialDto;
 }

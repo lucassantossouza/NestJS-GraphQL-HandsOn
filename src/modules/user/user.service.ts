@@ -1,37 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable } from '@nestjs/common';
-import { User } from 'src/entities/user.entity';
+import { Injectable, Module } from '@nestjs/common';
+import { User } from '../../entities/user.entity';
 import { Credential } from 'src/entities/credential.entity';
-import {
-  CreateUserDto,
-  UpdateUserDto,
-  GetUserDto,
-  DeleteUserDto,
-} from './user.dto';
-import { CreateCredentialDto } from '../credential/credential.dto';
+import { CreateUserDto } from './user.dto';
+import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  // async create(user: CreateUserDto, credential: CreateCredentialDto): User {
-  // }
-  // findAll(): User[] {
-  //   return this.userRepository.find();
-  // }
-  // findOne(id: GetUserDto): User {
-  //   return this.findOne(id);
-  // }
-  // update(id: GetUserDto, user: UpdateUserDto): User {
-  //   const userToUpdate = this.findOne(id);
-  //   userToUpdate.name = user.name;
-  //   userToUpdate.nickname = user.nickname;
-  //   userToUpdate.email = user.email;
-  //   userToUpdate.phone = user.phone;
-  //   return userToUpdate;
-  // }
-  // // remover logicamente alterando o campo deletedAt
-  // remove(id: DeleteUserDto): User {
-  //   const userToRemove = this.findOne(id);
-  //   userToRemove.deletedAt = new Date();
-  //   return userToRemove;
-  // }
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Credential)
+    private readonly credentialRepository: Repository<Credential>,
+  ) {}
+  async create(data: CreateUserDto): Promise<User> {
+    const credential = new Credential();
+    const { user: email, password } = data?.credential || {};
+    credential.user = email;
+    credential.password = password;
+    // create credential first and get the id
+    const { id: credentialId } =
+      await this.credentialRepository.save(credential);
+
+    const user = new User();
+    user.name = data.name;
+    user.nickname = data.nickname;
+    user.email = email;
+    user.credentialId = credentialId;
+    user.phone = data.phone;
+
+    return await this.userRepository.save(user);
+  }
 }

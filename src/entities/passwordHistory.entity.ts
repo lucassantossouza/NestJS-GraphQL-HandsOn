@@ -1,28 +1,39 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('credential')
-export class Credential {
+/**
+ * @description
+ * Entidade com fins de armazenar e rastrear o histórico de senhas de usuário.
+ */
+
+@Entity({ name: 'passwordHistory' })
+export class PasswordHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'bigint', nullable: false, comment: 'Id da credencial' })
+  credentialId: number;
+
   @Column({
+    type: 'varchar',
     length: 254,
     nullable: false,
-    comment: 'Usuário utilizado para login',
+    comment: 'Senha utilizada pelo usuário',
   })
-  user: string;
-
-  @Column({ length: 254 })
   password: string;
 
-  @Column({ length: 254 })
+  @Column({
+    type: 'varchar',
+    length: 254,
+    nullable: false,
+    comment: 'Salt do hash da senha',
+  })
   salt: string;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

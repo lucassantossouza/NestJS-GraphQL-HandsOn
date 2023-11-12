@@ -1,13 +1,19 @@
-{
-  "type": "mysql",
-  "host": "https://auth-db812.hstgr.io/index.php?db=u828832638_nestjsOrm",
-  "port": 3306,
-  "username": "u828832638_nestjs",
-  "password": "d!W6!wvblN7",
-  "database": "u828832638_nestjsOrm",
-  "entities": [
-    "src/**/*.entity.ts",
-    "dist/**/*.entity.js"
-  ],
-  "synchronize": true
-}
+[
+  {
+    "name": "default",
+    "type": "mysql",
+    "host": "srv812.hstgr.io",
+    "port": 3306,
+    "username": "u828832638_nestjs",
+    "password": "d!W6!wvblN7",
+    "database": "u828832638_nestjsOrm",
+    "logging": true,
+    "synchronize": false,
+    "cli": {
+      "entitiesDir": "src/migrations"
+    },
+    "migrations": [
+      "src/migrations/*.ts"
+    ]
+  }
+]
