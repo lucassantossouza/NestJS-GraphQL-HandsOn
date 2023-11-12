@@ -2,11 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
+import { ErrorHandlingMiddleware } from './middleware/errorHandlingMiddleware.middleware';
+// import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new GlobalExceptionFilter());
+  // app.useGlobalFilters(new GlobalExceptionFilter());
+  app.useGlobalFilters(new ErrorHandlingMiddleware());
 
   app.useLogger(false);
 

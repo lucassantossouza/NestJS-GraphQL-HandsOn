@@ -30,8 +30,9 @@ export class Credential {
 
   @UpdateDateColumn({
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: () => null,
     onUpdate: 'CURRENT_TIMESTAMP',
+    nullable: true,
   })
   updatedAt: Date;
 

@@ -5,14 +5,15 @@ import { UserModule } from './modules/user/user.module';
 import { CredentialModule } from './modules/credential/credential.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from 'db/dataSource';
-import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
+// import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
+// console.log('dataSourceOptions', dataSourceOptions);
 
 @Module({
   providers: [
-    {
-      provide: 'APP_FILTER',
-      useClass: GlobalExceptionFilter,
-    },
+    // {
+    //   provide: 'APP_FILTER',
+    //   useClass: GlobalExceptionFilter,
+    // },
   ],
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
