@@ -9,6 +9,7 @@ import {
   MaxLength,
   IsPhoneNumber,
   IsOptional,
+  IsNumberString,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -72,4 +73,20 @@ export class CreateUserDto {
     type: CreateCredentialDto,
   })
   credential: CreateCredentialDto;
+}
+
+export class GetOneUserDto {
+  // credential id
+  @IsNotEmpty({ message: 'ID da credencial é obrigatório' })
+  // check if number or numeric string
+  @IsNumberString(
+    { no_symbols: true },
+    { message: 'ID da credencial inválido' },
+  )
+  @ApiProperty({
+    required: true,
+    description: 'ID da credencial do usuário',
+    example: 1,
+  })
+  credentialId: number;
 }

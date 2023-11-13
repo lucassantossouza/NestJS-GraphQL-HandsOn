@@ -5,6 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { CredentialModule } from './modules/credential/credential.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { dataSourceOptions } from 'db/dataSource';
+import { AuthModule } from './modules/auth/auth.module';
 // import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
 // console.log('dataSourceOptions', dataSourceOptions);
 
@@ -21,6 +22,7 @@ import { dataSourceOptions } from 'db/dataSource';
     HomeModule,
     UserModule,
     CredentialModule,
+    AuthModule,
   ],
   controllers: [],
 })

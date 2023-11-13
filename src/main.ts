@@ -2,13 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ErrorHandlingMiddleware } from './middleware/errorHandlingMiddleware.middleware';
+import { SecuritySchemeObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 // import { GlobalExceptionFilter } from './middleware/globalExceptionFilter.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalFilters(new GlobalExceptionFilter());
-  app.useGlobalFilters(new ErrorHandlingMiddleware());
 
   app.useLogger(false);
 
@@ -18,7 +16,17 @@ async function bootstrap() {
     .setDescription('The NestJS API description')
     .setVersion('1.0')
     // .addTag('api')
-    // .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        in: 'header',
+        scheme: 'Bearer',
+        bearerFormat: 'token',
+        name: 'Authorization',
+      } as SecuritySchemeObject,
+      'Bearer',
+    )
+    .addSecurityRequirements('bearerAuth')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -1,6 +1,7 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Home Page')
 @Controller()
@@ -23,6 +24,19 @@ export class HomeController {
       site: 'https://tiwiki.com.br',
       // get url
       swagger: req.protocol + '://' + req.get('host') + '/swagger',
+    };
+  }
+
+  @Get('test')
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    summary: 'Página inicial',
+    description:
+      'Página inicial da API, para testar o middleware de autenticação.',
+  })
+  test() {
+    return {
+      message: 'Bem vindo ao NestJS ORM',
     };
   }
 }

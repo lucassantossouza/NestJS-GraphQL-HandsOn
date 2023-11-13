@@ -1,3 +1,4 @@
+import { EncryptUtils } from 'src/utils/encrypt.utils';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   HttpCode,
@@ -9,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { User } from '../../entities/user.entity';
 import { Credential } from 'src/entities/credential.entity';
-import { CreateUserDto } from './user.dto';
+import { CreateUserDto, GetOneUserDto } from './user.dto';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiResponse } from 'src/exceptions/apiResponse.exceptions';
@@ -30,26 +31,23 @@ export class UserService {
       (await this.credentialRepository.findOne({
         where: { user: email, deletedAt: null },
       })) || {};
-    // set validation error if email already exists
-    if (id) {
-      // throw new HttpException(
-      //   {
-      //     message: 'Não foi possível criar o usuário',
-      //   },
-      //   HttpStatus.BAD_REQUEST,
-      // );
-      // return Promise.reject({
-      //   statusCode: HttpStatus.BAD_REQUEST,
-      //   message: 'Não foi possível criar o usuário',
-      // });
+
+    // TODO: Precisa arrumar e mudar aqui
+    if (id)
       throw new ApiResponse(
         { message: 'Não foi possível criar o usuário' },
         400,
       );
-    }
+
+    const encryptUtils = new EncryptUtils();
 
     credential.user = email;
-    credential.password = password;
+
+    const { password: passwordHash, salt } =
+      await encryptUtils.encrypt(password);
+
+    credential.password = passwordHash;
+    credential.salt = salt;
     // create credential first and get the id
     const { id: credentialId } =
       await this.credentialRepository.save(credential);
@@ -62,5 +60,15 @@ export class UserService {
     user.phone = data.phone;
 
     return await this.userRepository.save(user);
+  }
+
+  async getOne({ credentialId }: GetOneUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { credentialId, deletedAt: null },
+    });
+
+    if (!user) throw new NotFoundException();
+
+    return user;
   }
 }

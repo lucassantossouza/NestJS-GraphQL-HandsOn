@@ -11,8 +11,8 @@ export class CredentialService {
     private readonly credentialRepository: Repository<Credential>,
   ) {}
 
-  async getOne(data: GetOneCredentialDto): Promise<Credential> {
-    const { user } = data;
+  async getOne({ user }: GetOneCredentialDto): Promise<Credential> {
+    // const { user } = data;
     // check if user exists and deletedAt is null
     return await this.credentialRepository.findOne({
       where: { user, deletedAt: null },

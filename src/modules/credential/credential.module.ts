@@ -8,5 +8,6 @@ import { Credential } from 'src/entities/credential.entity';
   controllers: [CredentialController],
   providers: [CredentialService],
   imports: [TypeOrmModule.forFeature([Credential])],
+  exports: [CredentialService],
 })
 export class CredentialModule {}
