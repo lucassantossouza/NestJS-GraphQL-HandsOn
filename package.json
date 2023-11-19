@@ -1,7 +1,7 @@
 {
-  "name": "NestJS-GraphQL-HandsOn",
+  "name": "NestJS-RestAPI-HandsOn",
   "version": "0.0.1",
-  "description": "API NestJS com GraphQL e TypeORM",
+  "description": "API NestJS RestAPI e TypeORM",
   "author": "Lucas Santos",
   "private": true,
   "license": "UNLICENSED",
