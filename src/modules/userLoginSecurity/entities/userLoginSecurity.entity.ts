@@ -14,20 +14,20 @@ import {
 @Entity({
   name: 'userLoginSecurity',
 })
-export class UserLoginSecurity {
+export class userLoginSecurity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'bigint' })
   credentialId: number;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
+  @Column({ type: 'boolean', nullable: true, default: false })
   locked: boolean;
 
   @Column({ type: 'bigint', nullable: true })
   lockedHistoryId: number;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', nullable: true, default: false })
   passwordResetRequired: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

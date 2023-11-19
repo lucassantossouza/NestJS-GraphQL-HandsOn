@@ -21,7 +21,9 @@ export class AuthService {
     // TODO: Gerar log de acesso quando usuario não encontrado
     const credential = await this.credentialService.getOne({ user });
 
-    if (!credential?.password) return new UnauthorizedException();
+    if (!credential?.password) {
+      return new UnauthorizedException();
+    }
 
     const encryptUtils = new EncryptUtils();
 
