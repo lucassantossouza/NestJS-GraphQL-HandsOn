@@ -5,5 +5,6 @@ import { HomeController } from './home.controller';
 @Module({
   providers: [HomeService],
   controllers: [HomeController],
+  exports: [HomeService],
 })
 export class HomeModule {}

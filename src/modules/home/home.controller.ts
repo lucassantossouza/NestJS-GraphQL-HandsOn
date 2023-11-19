@@ -1,9 +1,10 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Ip, Req, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Home Page')
+@ApiBearerAuth()
 @Controller()
 export class HomeController {
   @Get()
@@ -37,6 +38,24 @@ export class HomeController {
   test() {
     return {
       message: 'Bem vindo ao NestJS ORM',
+    };
+  }
+
+  @Get('ip')
+  @ApiOperation({
+    summary: 'Página inicial',
+    description: 'Peganado o IP do usuário.',
+  })
+  getIp(@Req() req: Request, @Ip() ipT: string) {
+    // TODO: Rota para testar como pegar o IP do usuário
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const agent = (req.headers['user-agent'] || '').split('/')[0];
+
+    console.log('ip', ip, 'agent', agent, 'ipT', ipT);
+    return {
+      ip,
+      agent,
+      ipT,
     };
   }
 }

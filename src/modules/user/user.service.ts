@@ -8,9 +8,9 @@ import {
   Module,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../../entities/user.entity';
-import { Credential } from 'src/entities/credential.entity';
-import { CreateUserDto, GetOneUserDto } from './user.dto';
+import { User } from './entities/user.entity';
+import { Credential } from 'src/modules/credential/entities/credential.entity';
+import { CreateUserDto, GetOneUserDto } from './dto/user.dto';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApiResponse } from 'src/exceptions/apiResponse.exceptions';
@@ -43,8 +43,7 @@ export class UserService {
 
     credential.user = email;
 
-    const { password: passwordHash, salt } =
-      await encryptUtils.encrypt(password);
+    const { hash: passwordHash, salt } = await encryptUtils.encrypt(password);
 
     credential.password = passwordHash;
     credential.salt = salt;

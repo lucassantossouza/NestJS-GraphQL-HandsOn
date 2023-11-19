@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Credential } from 'src/entities/credential.entity';
+import { Credential } from 'src/modules/credential/entities/credential.entity';
 import { Repository } from 'typeorm';
-import { GetOneCredentialDto } from './credential.dto';
+import { GetOneCredentialDto } from './dto/credential.dto';
 
 @Injectable()
 export class CredentialService {

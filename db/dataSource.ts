@@ -1,8 +1,11 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
+
+console.log('node', process.env.NODE_ENV);
+
 import { config as dotenvConfig } from 'dotenv';
 dotenvConfig();
 
-export const dataSourceOptions: DataSourceOptions = {
+const dataSourceOptions: DataSourceOptions = {
   type: 'mysql',
   host: process.env.DATABASE_HOST,
   port: parseInt(process.env.DATABASE_PORT),
@@ -12,7 +15,7 @@ export const dataSourceOptions: DataSourceOptions = {
   synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
   entities: ['dist/**/*.entity{.ts,.js}'],
   migrations: ['dist/db/migrations/*{.ts,.js}'],
+  logging: process.env.DATABASE_LOGGING === 'true',
 };
-
 const dataSource = new DataSource(dataSourceOptions);
 export default dataSource;

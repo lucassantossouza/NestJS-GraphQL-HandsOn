@@ -1,6 +1,6 @@
 //cria as validações dos dados que serão recebidos
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateCredentialDto } from '../credential/credential.dto';
+import { CreateCredentialDto } from '../../credential/dto/credential.dto';
 import {
   IsEmail,
   IsNotEmpty,

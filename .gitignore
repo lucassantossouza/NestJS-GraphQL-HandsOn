@@ -36,6 +36,7 @@ lerna-debug.log*
 
 # environment
 .env
+.env.*
 
 # migrations and seeds
 /db/migrations

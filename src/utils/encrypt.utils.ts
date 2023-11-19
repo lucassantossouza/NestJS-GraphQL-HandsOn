@@ -5,8 +5,8 @@ export class EncryptUtils {
   async encrypt(plainText: string = ''): Promise<any> {
     try {
       const salt = await bcrypt.genSalt();
-      const hashPassword = await bcrypt.hash(plainText, salt);
-      return { salt, password: hashPassword };
+      const hash = await bcrypt.hash(plainText, salt);
+      return { salt, hash };
     } catch (error) {
       return {};
     }
@@ -18,8 +18,8 @@ export class EncryptUtils {
     salt: string,
   ): Promise<boolean> {
     try {
-      const hashPassword = await bcrypt.hash(password, salt);
-      return hashPassword === cipherText;
+      const hash = await bcrypt.hash(password, salt);
+      return hash === cipherText;
     } catch (error) {
       console.log('error', error);
       return false;
