@@ -42,7 +42,7 @@ export class AuthService {
     );
 
     // get env token expire in minutes
-    const tokenExpireIn = process.env.Token_EXPIRES_IN || '60';
+    const tokenExpireIn = process.env.TOKEN_EXPIRES_IN || '60';
 
     const date = new Date();
     // set date to expire token in format timestamp
