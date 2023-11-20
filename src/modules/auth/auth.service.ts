@@ -67,20 +67,21 @@ export class AuthService {
     );
 
     // get env token expire in minutes
-    const tokenExpireIn = parseInt(process.env.TOKEN_EXPIRES_IN || '60', 10);
+    // const tokenExpireIn = parseInt(process.env.TOKEN_EXPIRES_IN || '60', 10);
+    const expiresIn = parseInt(process.env.TOKEN_EXPIRES_IN || '60', 10);
 
-    const date = new Date();
+    // const date = new Date();
     // set date to expire token in format timestamp
     // date.setMinutes(date.getMinutes() + parseInt(tokenExpireIn) + 180);
 
     // TODO: Validar como verificar se o token expirou timestamp não esta inserindo corretamente o horario do servidor esta inserindo o horario do cliente
-    date.setMinutes(date.getMinutes() + tokenExpireIn + 180);
+    // date.setMinutes(date.getMinutes() + tokenExpireIn + 180);
 
     const tokenData = await this.tokenService.create({
       credentialId: credential.id,
       token: token.hash,
       salt: token.salt,
-      expiresIn: date,
+      expiresIn,
     });
 
     /**
