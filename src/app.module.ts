@@ -7,7 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TokenModule } from './modules/token/token.module';
 import { DatabaseModule } from './modules/database/database.module';
 import { LoggerModule } from './modules/logger/logger.module';
-import { LoginHistory } from './modules/login-history/entities/loginHistory.entity';
+import { LoginHistory } from './modules/loginHistory/entities/loginHistory.entity';
 
 @Module({
   providers: [],

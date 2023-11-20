@@ -6,7 +6,7 @@ import { UserModule } from '../user/user.module';
 import { CredentialModule } from '../credential/credential.module';
 // import { TokenModule } from '../token/token.module';
 import { HomeModule } from '../home/home.module';
-import { LoginHistoryModule } from '../login-history/loginHistory.module';
+import { LoginHistoryModule } from '../loginHistory/loginHistory.module';
 // import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Token } from '../token/entities/token.entity';
 

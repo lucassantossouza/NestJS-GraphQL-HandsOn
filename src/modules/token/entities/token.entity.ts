@@ -25,6 +25,8 @@ export class Token {
     type: 'timestamp',
     nullable: false,
     comment: 'Data de expiração',
+    // sum current date with env variable parseInt(process.env.TOKEN_EXPIRES_IN || '60', 10)
+    default: () => 'CURRENT_TIMESTAMP',
   })
   expiresIn: Date;
 

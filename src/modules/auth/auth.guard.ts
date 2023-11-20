@@ -5,8 +5,8 @@ import { TokenService } from '../token/token.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from '../token/entities/token.entity';
 import { Repository } from 'typeorm';
-import { LoginHistoryService } from '../login-history/loginHistory.service';
-import { LoggerService } from '../logger/logger.service';
+import { LoginHistoryService } from '../loginHistory/loginHistory.service';
+// import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -82,6 +82,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch (error) {
+      console.log('error', error);
       // TODO: Token inválido - gerar log
       this.loginHistoryService.create({
         username: 'anonymous',
@@ -89,7 +90,7 @@ export class AuthGuard implements CanActivate {
         success: false,
         ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress,
       });
-      new LoggerService().warn(error?.message || 'Token inválido');
+      // new LoggerService().warn(error?.message || 'Token inválido');
       throw new UnauthorizedException('Usuário não autenticado');
     }
     return true;

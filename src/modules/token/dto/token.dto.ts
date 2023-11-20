@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsNumberString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumberString, IsString } from 'class-validator';
 
 export class CreateTokenDto {
   @IsNotEmpty({ message: 'Id da credencial é obrigatório' })
@@ -29,14 +29,15 @@ export class CreateTokenDto {
   salt: string;
 
   @IsNotEmpty({ message: 'Data de expiração é obrigatório' })
-  // se é uma data e se a data é maior que a data atual
+  // se é uma data e se a data ou uma iso string
   @IsDate({ message: 'Data de expiração deve ser uma data válida' })
+  @IsString({ message: 'Data de expiração deve ser uma string' })
   @ApiProperty({
-    required: true,
+    required: false,
     description: 'Data de expiração do token',
     example: '2021-01-01T00:00:00.000Z',
   })
-  expiresIn: Date;
+  expiresIn: Date | string;
 }
 
 export class GetOneTokenDto {
