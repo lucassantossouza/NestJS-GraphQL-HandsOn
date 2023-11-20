@@ -48,11 +48,26 @@ export class GlobalFilter<T> extends LoggerService implements ExceptionFilter {
         code = (exception as any).code;
         this.error(message, false);
         break;
+      case TypeError:
+        status = (exception as any).status || HttpStatus.INTERNAL_SERVER_ERROR;
+        message = `Erro interno do servidor: ${
+          (exception as TypeError).message
+        }`;
+        code = (exception as any).code;
+        this.error(message, false);
+        break;
       default:
         status = (exception as any).status || HttpStatus.INTERNAL_SERVER_ERROR;
-        // this.error(message, false);
+        if (status === HttpStatus.INTERNAL_SERVER_ERROR)
+          this.error(message, false);
         break;
     }
+
+    message = /prd|prod/.test(process.env.NODE_ENV)
+      ? 'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.'
+      : message;
+
+    console.log('testando uma coisinha', (exception as any)?.response);
 
     response.status(status).json({
       // statusCode: status,

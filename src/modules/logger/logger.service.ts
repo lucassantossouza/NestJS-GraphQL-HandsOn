@@ -65,7 +65,7 @@ export class LoggerService {
       column: (stack.split(':')?.[3] || '').replaceAll(/\D/g, ''),
     };
 
-    if (/prd|prod/.test(process.env.NODE_ENV)) {
+    if (!/prd|prod/.test(process.env.NODE_ENV)) {
       message =
         'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.';
     } else {
