@@ -64,7 +64,7 @@ export class GlobalFilter<T> extends LoggerService implements ExceptionFilter {
         break;
     }
 
-    !/prd|prod/.test(process.env.NODE_ENV)
+    /prd|prod/.test(process.env.NODE_ENV)
       ? (message =
           'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.')
       : (responseLogger = {
