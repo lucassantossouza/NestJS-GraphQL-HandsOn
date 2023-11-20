@@ -40,6 +40,8 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
+      console.log('payload', payload);
+
       const tokenExist = await this.tokenRepository.findOne({
         where: { token: payload.token },
       });
@@ -62,12 +64,15 @@ export class AuthGuard implements CanActivate {
       const tokenData = await this.tokenRepository
         .createQueryBuilder('t')
         .where(
-          'TIMESTAMPDIFF(MINUTE, CURRENT_TIMESTAMP, t.expiresIn) >= 0 AND t.token like :token',
+          'TIMESTAMPDIFF(MINUTE, t.expiresIn, CURRENT_TIMESTAMP) <= :minutes AND t.token like :token',
           {
             token: payload.token,
+            minutes: parseInt(process.env.TOKEN_EXPIRES_IN || '60', 10),
           },
         )
         .getOne();
+
+      console.log('tokenData', tokenData, payload);
 
       if (!tokenData) {
         this.loginHistoryService.create({

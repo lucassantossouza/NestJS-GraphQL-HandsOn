@@ -15,6 +15,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly tokenService: TokenService,
     private readonly loginHistoryService: LoginHistoryService,
+    private readonly logger: LoggerService,
   ) {}
   async signIn(user: string, password: string, ip: string): Promise<any> {
     const credential = await this.credentialService.getOne({ user });
@@ -84,6 +85,8 @@ export class AuthService {
       expiresIn,
     });
 
+    console.log('tokenData', tokenData);
+
     /**
      * Verifica se o token foi gerado, caso não tenha sido gera um log de acesso com o motivo e retorna a exceção para o usuário
      */
@@ -96,7 +99,7 @@ export class AuthService {
         credentialId: credential.id,
       });
       // TODO: se o contador de falhas de login não estiver zerado, zerar pois o usuário conseguiu logar porem houve uma falha na geração do token implementar aqui
-      new LoggerService().error(
+      this.logger.error(
         'Usuário não conseguiu token de acesso para autenticação',
       ); //return new BadRequestException();
     }

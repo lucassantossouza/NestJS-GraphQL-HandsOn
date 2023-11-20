@@ -28,10 +28,13 @@ export class TokenService {
     //   salt,
     //   expiresIn,
     // });
-    return await this.tokenRepository.query(`
+    await this.tokenRepository.query(`
       INSERT INTO token (credentialId, token, salt, expiresIn)
       VALUES (${credentialId}, '${token}', '${salt}', CURRENT_TIMESTAMP + INTERVAL '${expiresIn}' MINUTE)
     `);
+
+    // return token created
+    return await this.getOne({ token });
   }
 
   async getOne({ token }: GetOneTokenDto): Promise<Token> {
