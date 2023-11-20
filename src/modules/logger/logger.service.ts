@@ -6,6 +6,7 @@ export class LoggerService {
   private readonly slack = new SlackService();
   private readonly logger = new Logger(LoggerService.name);
   private level: 'log' | 'error' | 'warn';
+  protected response = {};
 
   /**
    * Geral: Para logs de informações gerais.
@@ -65,7 +66,7 @@ export class LoggerService {
       column: (stack.split(':')?.[3] || '').replaceAll(/\D/g, ''),
     };
 
-    if (!/prd|prod/.test(process.env.NODE_ENV)) {
+    if (/prd|prod/.test(process.env.NODE_ENV)) {
       message =
         'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.';
     } else {
@@ -88,6 +89,8 @@ export class LoggerService {
     });
 
     response['message'] = message;
+
+    this.response = response;
 
     if (critical) throw new HttpException(response, status);
   }

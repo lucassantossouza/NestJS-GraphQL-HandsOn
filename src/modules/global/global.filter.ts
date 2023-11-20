@@ -18,6 +18,7 @@ export class GlobalFilter<T> extends LoggerService implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+    let responseLogger = {};
 
     let message =
       (exception as any)?.message?.message ||
@@ -63,20 +64,19 @@ export class GlobalFilter<T> extends LoggerService implements ExceptionFilter {
         break;
     }
 
-    message = /prd|prod/.test(process.env.NODE_ENV)
-      ? 'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.'
-      : message;
-
-    console.log('testando uma coisinha', (exception as any)?.response);
+    !/prd|prod/.test(process.env.NODE_ENV)
+      ? (message =
+          'Serviço indisponível no momento, nosso time já foi notificado e está trabalhando para resolver o problema. Por favor, tente novamente mais tarde.')
+      : (responseLogger = {
+          ...this.response,
+          message: this.response?.['message'] || message,
+        });
 
     response.status(status).json({
-      // statusCode: status,
       timestamp: new Date().toISOString(),
       path: request.url,
-      // code,
       message,
       method: request.method,
-      // get error stack by LoggerService
       ...((exception as any)?.response?.stack || {}),
     });
   }
