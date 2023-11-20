@@ -49,8 +49,8 @@ export class GlobalFilter<T> extends LoggerService implements ExceptionFilter {
         this.error(message, false);
         break;
       default:
-        status = HttpStatus.INTERNAL_SERVER_ERROR;
-        this.error(message, false);
+        status = (exception as any).status || HttpStatus.INTERNAL_SERVER_ERROR;
+        // this.error(message, false);
         break;
     }
 

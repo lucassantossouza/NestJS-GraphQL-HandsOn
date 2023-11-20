@@ -4,6 +4,7 @@ import { Token } from './entities/token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateTokenDto,
+  DeleteTokenByCredentialDto,
   DeleteTokenDto,
   GetOneTokenDto,
 } from './dto/token.dto';
@@ -37,5 +38,9 @@ export class TokenService {
 
   async delete({ token }: DeleteTokenDto): Promise<void> {
     await this.tokenRepository.softDelete({ token });
+  }
+
+  async deleteAll({ credentialId }: DeleteTokenByCredentialDto): Promise<void> {
+    await this.tokenRepository.softDelete({ credentialId });
   }
 }

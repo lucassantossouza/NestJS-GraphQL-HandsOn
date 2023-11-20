@@ -58,3 +58,14 @@ export class DeleteTokenDto {
   })
   token: string;
 }
+
+export class DeleteTokenByCredentialDto {
+  @IsNotEmpty({ message: 'Id da credencial é obrigatório' })
+  @IsNumberString({}, { message: 'Id da credencial deve ser um número' })
+  @ApiProperty({
+    required: true,
+    description: 'Id da credencial',
+    example: 1,
+  })
+  credentialId: number;
+}

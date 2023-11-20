@@ -1,13 +1,11 @@
 import { TokenService } from './../token/token.service';
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CredentialService } from 'src/modules/credential/credential.service';
 import { EncryptUtils } from 'src/utils/encrypt.utils';
 import { UserService } from 'src/modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoginHistoryService } from '../login-history/loginHistory.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class AuthService {
@@ -16,26 +14,51 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly tokenService: TokenService,
+    private readonly loginHistoryService: LoginHistoryService,
   ) {}
-  async signIn(user: string, password: string): Promise<any> {
-    // TODO: Gerar log de acesso quando usuario não encontrado
+  async signIn(user: string, password: string, ip: string): Promise<any> {
     const credential = await this.credentialService.getOne({ user });
-
-    if (!credential?.password) {
-      return new UnauthorizedException();
+    if (!credential) {
+      /**
+       * Usuario não encontrado no banco de dados, gera um log de acesso com o motivo e retorna a exceção para o usuário
+       */
+      this.loginHistoryService.create({
+        username: user,
+        failReason: 'User not found',
+        success: false,
+        ip,
+      });
+      return new UnauthorizedException('Usuário ou senha inválidos');
     }
+
+    // TODO: Verificar se o usuário está bloqueado e retornar o problema precisa implementar
 
     const encryptUtils = new EncryptUtils();
 
-    // TODO: Gerar log de acesso quando senha não confere
+    /**
+     * Verifica se a senha informada confere com a senha armazenada no banco de dados, gera um log de acesso com o motivo e retorna a exceção para o usuário
+     */
     if (
       !(await encryptUtils.compare(
         password,
         credential.password,
         credential.salt,
       ))
-    )
-      return new UnauthorizedException();
+    ) {
+      this.loginHistoryService.create({
+        username: user,
+        failReason: 'Password does not match',
+        success: false,
+        ip,
+        credentialId: credential.id,
+      });
+      return new UnauthorizedException('Usuário ou senha inválidos');
+    }
+
+    /**
+     * Deleta todos os tokens de acesso do usuário no banco de dados
+     */
+    await this.tokenService.deleteAll({ credentialId: credential.id });
 
     // generate token set in payload
     const token = await encryptUtils.encrypt(
@@ -57,10 +80,23 @@ export class AuthService {
       expiresIn: date,
     });
 
-    // TODO: Gerar log e possivelmente um alerta para informar que o token não foi gerado e verficar a causa
-    if (!tokenData) return new BadRequestException();
+    /**
+     * Verifica se o token foi gerado, caso não tenha sido gera um log de acesso com o motivo e retorna a exceção para o usuário
+     */
+    if (!tokenData) {
+      this.loginHistoryService.create({
+        username: user,
+        failReason: 'Token not generated',
+        success: false,
+        ip,
+        credentialId: credential.id,
+      });
+      // TODO: se o contador de falhas de login não estiver zerado, zerar pois o usuário conseguiu logar porem houve uma falha na geração do token implementar aqui
+      new LoggerService().error(
+        'Usuário não conseguiu token de acesso para autenticação',
+      ); //return new BadRequestException();
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, nickname, email, phone, id } = await this.userService.getOne({
       credentialId: credential.id,
     });
@@ -74,7 +110,15 @@ export class AuthService {
       sub: id,
     };
 
-    // TODO: Gerar log de acesso quando token foi gerado com sucesso representa que o usuário está logado
+    /**
+     * Gera um log resultado da tentativa de login com sucesso
+     */
+    this.loginHistoryService.create({
+      username: user,
+      success: true,
+      ip,
+      credentialId: credential.id,
+    });
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };

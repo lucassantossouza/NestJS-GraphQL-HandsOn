@@ -1,13 +1,12 @@
 import { CanActivate, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-// import { InjectRepository } from '@nestjs/typeorm';
-// import { Token } from '../token/entities/token.entity';
-// import { Repository } from 'typeorm';
 import { TokenService } from '../token/token.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Token } from '../token/entities/token.entity';
 import { Repository } from 'typeorm';
+import { LoginHistoryService } from '../login-history/loginHistory.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -16,6 +15,7 @@ export class AuthGuard implements CanActivate {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly tokenService: TokenService,
+    private readonly loginHistoryService: LoginHistoryService,
   ) {}
 
   // TODO: Colocar as regras de validação
@@ -23,29 +23,38 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: any): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const tokenAuth = this.extractTokenFromHeader(request);
-    console.log('token auth', tokenAuth);
 
-    // TODO: Acesso sem token - gerar log
-    if (!tokenAuth) throw new UnauthorizedException();
+    // TODO: Acesso sem token criar um contador e bloquear o ip por 5 minutos
+    if (!tokenAuth) {
+      this.loginHistoryService.create({
+        username: 'anonymous',
+        failReason: 'Token not found',
+        success: false,
+        ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress,
+      });
+      throw new UnauthorizedException('Usuário não autenticado');
+    }
 
     try {
       const payload = await this.jwtService.verifyAsync(tokenAuth, {
         secret: process.env.JWT_SECRET,
       });
-      // TODO: Implementar a validação para pegar dentro do payload o token e validar se existe na base de dados e se o id do usuário é o mesmo caso contrario deslogar o usuário e gerar log
 
-      // const tokenData = await this.tokenService.getOne({
-      //   token: payload.token,
-      // });
-
-      // pegar o somente o token para ver se existe na base de dados pois pode ser que o usuario tenha alterado o token e o mesmo não existe na base de dados
-      // TODO: gerar relatorio token não existe na base de dados possivelmente o usuario alterou o token formando um ataque de força bruta
       const tokenExist = await this.tokenRepository.findOne({
         where: { token: payload.token },
       });
 
-      console.log('token exist', tokenExist);
-      if (!tokenExist) throw new UnauthorizedException();
+      if (!tokenExist) {
+        this.loginHistoryService.create({
+          username: payload.email || 'anonymous',
+          failReason: 'Token not found',
+          success: false,
+          ip:
+            request.headers['x-forwarded-for'] || request.socket.remoteAddress,
+        });
+        // gerar um contador de tentativas de acesso com token inválido e bloquear o ip por 5 minutos
+        throw new UnauthorizedException('Usuário não autenticado');
+      }
 
       // get token data and check expired by token
       // SELECT * FROM token t WHERE TIMESTAMPDIFF(MINUTE, t.expiresIn, CURRENT_TIMESTAMP) >= 0
@@ -60,15 +69,28 @@ export class AuthGuard implements CanActivate {
         )
         .getOne();
 
-      console.log('token data', tokenData);
-
-      if (!tokenData) throw new UnauthorizedException();
+      if (!tokenData) {
+        this.loginHistoryService.create({
+          username: payload.email || 'anonymous',
+          failReason: 'Token expired',
+          success: false,
+          ip:
+            request.headers['x-forwarded-for'] || request.socket.remoteAddress,
+        });
+        throw new UnauthorizedException('Usuário não autenticado');
+      }
 
       request['user'] = payload;
     } catch (error) {
-      console.log('error', error);
       // TODO: Token inválido - gerar log
-      throw new UnauthorizedException();
+      this.loginHistoryService.create({
+        username: 'anonymous',
+        failReason: 'Token invalid',
+        success: false,
+        ip: request.headers['x-forwarded-for'] || request.socket.remoteAddress,
+      });
+      new LoggerService().warn(error?.message || 'Token inválido');
+      throw new UnauthorizedException('Usuário não autenticado');
     }
     return true;
   }
