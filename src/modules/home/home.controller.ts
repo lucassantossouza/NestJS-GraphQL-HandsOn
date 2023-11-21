@@ -50,8 +50,6 @@ export class HomeController {
     // TODO: Rota para testar como pegar o IP do usuário
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const agent = (req.headers['user-agent'] || '').split('/')[0];
-
-    console.log('ip', ip, 'agent', agent, 'ipT', ipT);
     return {
       ip,
       agent,

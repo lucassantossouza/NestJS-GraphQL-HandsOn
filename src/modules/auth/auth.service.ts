@@ -85,8 +85,6 @@ export class AuthService {
       expiresIn,
     });
 
-    console.log('tokenData', tokenData);
-
     /**
      * Verifica se o token foi gerado, caso não tenha sido gera um log de acesso com o motivo e retorna a exceção para o usuário
      */

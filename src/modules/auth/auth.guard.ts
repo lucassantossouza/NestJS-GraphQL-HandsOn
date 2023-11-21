@@ -40,7 +40,20 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
-      console.log('payload', payload);
+      console.log(payload);
+
+      // check exist token hash in payload
+      if (!payload.token) {
+        this.loginHistoryService.create({
+          username: payload.email || 'anonymous',
+          failReason: 'TokenHash not found in Token payload',
+          success: false,
+          ip:
+            request.headers['x-forwarded-for'] || request.socket.remoteAddress,
+        });
+        // gerar um contador de tentativas de acesso com token inválido e bloquear o ip por 5 minutos
+        throw new UnauthorizedException('Usuário não autenticado');
+      }
 
       const tokenExist = await this.tokenRepository.findOne({
         where: { token: payload.token },
@@ -72,8 +85,6 @@ export class AuthGuard implements CanActivate {
         )
         .getOne();
 
-      console.log('tokenData', tokenData, payload);
-
       if (!tokenData) {
         this.loginHistoryService.create({
           username: payload.email || 'anonymous',
@@ -87,7 +98,6 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch (error) {
-      console.log('error', error);
       // TODO: Token inválido - gerar log
       this.loginHistoryService.create({
         username: 'anonymous',

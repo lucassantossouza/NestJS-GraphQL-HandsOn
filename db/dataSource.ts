@@ -1,7 +1,5 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 
-console.log('node', process.env.NODE_ENV);
-
 import { config as dotenvConfig } from 'dotenv';
 dotenvConfig();
 

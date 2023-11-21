@@ -1,6 +1,5 @@
 import { All, Controller, InternalServerErrorException } from '@nestjs/common';
 import { DatabaseError } from './database';
-console.log('Node', process.env.NODE_ENV);
 
 @Controller('*')
 export class DatabaseMinimalController {
