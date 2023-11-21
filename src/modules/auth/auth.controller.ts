@@ -34,6 +34,8 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    const user = req.user;
+    delete user.token;
+    return user;
   }
 }
